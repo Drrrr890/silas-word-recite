@@ -31,7 +31,7 @@
 <title>Silas单词背诵</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%233568e8'/%3E%3Ctext x='32' y='46' font-size='42' font-family='Arial' font-weight='bold' text-anchor='middle' fill='white'%3ES%3C/text%3E%3C/svg%3E">
 <meta name="application-name" content="Silas单词背诵">
-<!-- BUILD 1.2.0 -->
+<!-- BUILD 1.2.1 -->
 <style>
   :root{
     --bg:#f4f6fb; --card:#ffffff; --line:#e3e8f2; --text:#1b2434; --muted:#6b7688;
@@ -546,7 +546,7 @@
       <div class="card">
         <h2>掌握情况</h2>
         <p style="margin:0" id="mastery"></p>
-        <p class="note" style="margin-top:10px">难度规则：每个单词独立进阶。正确率高于 50% 且累计答对次数达标时升一级，每级多挖 1～2 个字母；答错降一级。升到最高级后只看中文默写整词，连续答对 2 次标记为「已掌握」，之后仍会随机出现复习。无论题面挖空几个字母，答题时都要写出完整单词，挖空只作为提示。</p>
+        <p class="note" style="margin-top:10px">挖空规则：单个长单词（6 个字母及以上）挖 2～3 个字母，短单词挖 1～2 个；两三个词组成的短语或组合词，每个词都各挖 1～2 个字母。难度规则：每个单词独立进阶，正确率高于 50% 且累计答对次数达标时升一级，每级每个词多挖 2 个字母；答错降一级。升到最高级后只看中文默写整词，连续答对 2 次标记为「已掌握」，之后仍会随机出现复习。无论题面挖空几个字母，答题时都要写出完整单词，挖空只作为提示。</p>
         <p class="note">这些学习统计受保护：清空或覆盖统计需要在页头打开「管理窗口」并输入管理密码。</p>
       </div>
     </section>
@@ -563,7 +563,7 @@
     <p class="note">勾选一个或多个来源后，背诵、词库和统计都只看这些来源；同一个单词出现在多个来源时，勾中任意一个都会练到它。「未标注」是自己添加时没填来源的单词。每个来源后面的数字依次是「单词总数 · 还没练过的个数」；背诵页上方也会显示当前这个词已经练过几次、本组还有几个词一次都没练过。想先把新词过一遍，可勾选背诵页的「只练没练过的」。</p>
   </div>
 
-  <p class="foot"><b>版本 1.2.0</b>：新增练习次数与「还有几个单词没练过」的显示、iPad 手写输入（Apple Pencil 随手写 + 手写草稿板），以及「只练没练过的」范围开关。<br>操作提示：每题都要写出完整的英文单词（上方挖空只是提示，不能只补缺少的字母），输入后按回车或点「检查」；答完会停在本题、不会自动跳题，看清正确单词、例句和注释后，点「下一个」按钮（或按回车）才开始下一个单词的练习；关闭页面后会自动接着上一次那一题继续。<br>难度自动进阶：初始挖 1～2 个字母，正确率高于 50% 且答对次数足够时升一级、每级多挖 1～2 个，最后变成只看中文默写整词；答错会降一级。答错和「看答案」都会累计错误次数。<br>每题都可以点「听发音」听英语读音（发音已内置在程序里，离线可播），答完题会自动朗读一遍；中文词义、来源、双语例句和答后答案（正确单词、音标、词性与词典注释）都集中在下方同一张「学习卡」里（例句答题时挖空、答完在同一张卡里补全，可用「例句提示」开关切换；「词性注释」开关只控制音标和注释，正确单词始终显示）；学习统计受管理窗口保护，清空、覆盖、删除等操作需要管理密码；页面下方可以按来源勾选背诵范围，一个单词属于多个来源时，任选一个来源都会练到它。<br>还可以到「单词库」勾选若干单词，点「练习选中单词」只练这些词；背诵页顶部提示条可随时退出针对练习。</p>
+  <p class="foot"><b>版本 1.2.1</b>：调整挖空难度——长单词（6 个字母及以上）每次挖 2～3 个字母；两三个词组成的短语或组合词，每个词都各挖 1～2 个字母；升级后每个词再逐级多挖 2 个。<br><b>版本 1.2.0</b>：新增练习次数与「还有几个单词没练过」的显示、iPad 手写输入（Apple Pencil 随手写 + 手写草稿板），以及「只练没练过的」范围开关。<br>操作提示：每题都要写出完整的英文单词（上方挖空只是提示，不能只补缺少的字母），输入后按回车或点「检查」；答完会停在本题、不会自动跳题，看清正确单词、例句和注释后，点「下一个」按钮（或按回车）才开始下一个单词的练习；关闭页面后会自动接着上一次那一题继续。<br>难度自动进阶：长单词初始挖 2～3 个字母、短单词初始挖 1～2 个，短语每个词都各挖 1～2 个；正确率高于 50% 且答对次数足够时升一级、每级每个词多挖 2 个，最后变成只看中文默写整词；答错会降一级。答错和「看答案」都会累计错误次数。<br>每题都可以点「听发音」听英语读音（发音已内置在程序里，离线可播），答完题会自动朗读一遍；中文词义、来源、双语例句和答后答案（正确单词、音标、词性与词典注释）都集中在下方同一张「学习卡」里（例句答题时挖空、答完在同一张卡里补全，可用「例句提示」开关切换；「词性注释」开关只控制音标和注释，正确单词始终显示）；学习统计受管理窗口保护，清空、覆盖、删除等操作需要管理密码；页面下方可以按来源勾选背诵范围，一个单词属于多个来源时，任选一个来源都会练到它。<br>还可以到「单词库」勾选若干单词，点「练习选中单词」只练这些词；背诵页顶部提示条可随时退出针对练习。</p>
 </div>
 
 <div id="toast"></div>
@@ -1438,8 +1438,25 @@ go fishing	去钓鱼
 
   function lettersOf(en){ return (en.match(/[a-zA-Z]/g) || []).length; }
   function rate(w){ return w.seen ? Math.round(w.right / w.seen * 100) : null; }
-  // L0 挖 1~2 个，每升一级多挖 1~2 个；最高一级 = 全部字母挖空（整词默写）
+  // 难度上限按整条英文的字母总数算，保证最高级仍是整词默写
   function maxLevelFor(L){ return L <= 1 ? 0 : Math.max(1, Math.ceil((L - 2) / 2)); }
+
+  // ===== 1.2.1 挖空规则：按「词段」分别挖空 =====
+  // 词段 = 连续字母串；空格短语、连字符复合词、斜杠同义词都会被切成 2~3 段。
+  // · 单个长单词（>=6 个字母）：基础挖 2~3 个字母，不再只挖 1~2 个
+  // · 单个短单词（<6 个字母）：基础挖 1~2 个字母
+  // · 组合词条（>=2 个词段）：每个词段都各挖 1~2 个字母
+  // · 每升一级每个词段再多挖 2 个字母；最高级全部字母挖空
+  function wordSegments(en){
+    var segs = [], re = /[a-zA-Z]+/g, m;
+    while((m = re.exec(en)) !== null){
+      var part = [];
+      for(var i = m.index; i < m.index + m[0].length; i++) part.push(i);
+      segs.push(part);
+    }
+    return segs;
+  }
+  function randInt(a, b){ return a + Math.floor(Math.random() * (b - a + 1)); }
 
   function makeCloze(en, level, avoid){
     var idx = [];
@@ -1449,18 +1466,32 @@ go fishing	去钓鱼
     var maxLevel = maxLevelFor(idx.length);
     level = Math.max(0, Math.min(level, maxLevel));
     var full = level >= maxLevel;
-    var low = 1 + level * 2, high = 2 + level * 2;
+    var segs = wordSegments(en);
+    var combo = segs.length >= 2;
     var picked, missing, masked, n, tries = 0;
     // 每次重新随机「挖几个 + 挖哪几个」；若和最近几次完全一样就重抽，避免连续重复
     do {
-      n = low + Math.floor(Math.random() * (high - low + 1));
-      n = full ? idx.length : Math.min(n, Math.max(1, idx.length - 1));
-      picked = shuffle(idx.slice()).slice(0, n).sort(function(a,b){ return a - b; });
+      picked = [];
+      segs.forEach(function(part){
+        var low, high;
+        if(combo){ low = 1; high = 2; }                       // 组合词：每个词都挖 1~2 个
+        else if(part.length >= 6){ low = 2; high = 3; }       // 单个长单词：挖 2~3 个
+        else { low = 1; high = 2; }                           // 单个短单词：挖 1~2 个
+        var k = randInt(low + level * 2, high + level * 2);
+        // 非整词默写时，每个词段至少留 1 个字母可见；只有 1 个字母的词段就整段挖掉
+        k = full ? part.length : Math.min(k, Math.max(1, part.length - 1));
+        picked = picked.concat(shuffle(part.slice()).slice(0, k));
+      });
+      // 非整词默写时，整条英文至少留 1 个字母可见
+      if(!full && picked.length >= idx.length) picked = picked.slice(0, idx.length - 1);
+      picked.sort(function(a,b){ return a - b; });
+      n = picked.length;
       missing = picked.map(function(i){ return en.charAt(i); });
       masked = en.split('').map(function(ch,i){ return picked.indexOf(i) >= 0 ? '_' : ch; }).join('');
       tries++;
     } while(avoid.indexOf(masked) >= 0 && tries < 15 && !full && idx.length > 1);
-    return {masked:masked, missing:missing, count:n, full:n >= idx.length, level:level};
+    return {masked:masked, missing:missing, count:n, full:n >= idx.length,
+            level:level, combo:combo, segments:segs.length};
   }
 
   function norm(s){ return String(s).replace(/[\s.,\/\\-]/g, '').toLowerCase(); }
@@ -1510,16 +1541,19 @@ go fishing	去钓鱼
   }
   function renderHint(){
     var L = lettersOf(current.en);
+    var segCount = (current.en.match(/[a-zA-Z]+/g) || []).length;
+    var comboNote = (segCount >= 2 && !cloze.full)
+      ? ' · 由 ' + segCount + ' 个词组成，每个词都挖了空' : '';
     $('hint').textContent = cloze.full
       ? '难度 L' + cloze.level + '（最高）· 全部 ' + L + ' 个字母已挖空 · 请写出完整单词'
-      : '难度 L' + cloze.level + ' · 共 ' + L + ' 个字母 · 显示时挖空 ' + cloze.count + ' 个（答题仍写整个单词）';
+      : '难度 L' + cloze.level + ' · 共 ' + L + ' 个字母 · 显示时挖空 ' + cloze.count + ' 个（答题仍写整个单词）' + comboNote;
     $('answer').placeholder = '写出完整的英文单词';
     if(current.mastered) $('levelNote').textContent = '已达最高难度：看中文默写整词，仍会随机出现复习';
     else if(cloze.full) $('levelNote').textContent = '整词默写关卡 · 连续答对 2 次即标记为「已掌握」';
     else {
       var need = current.level + 2, r = rate(current);
       $('levelNote').textContent = '正确率 ' + (r === null ? '—' : r + '%') +
-        ' · 正确率 >50% 且累计答对 ' + need + ' 次后升级（当前 ' + current.right + ' 次，每升一级多挖 1～2 个字母）';
+        ' · 正确率 >50% 且累计答对 ' + need + ' 次后升级（当前 ' + current.right + ' 次，每升一级每个词多挖 2 个字母）';
     }
   }
   // 背诵页信息条：显示当前范围、这个词的练习次数、本组还有几个词没练过
@@ -1612,7 +1646,7 @@ go fishing	去钓鱼
     var r = result || {ok:false};
     var extra = '';
     if(r.masteredNow) extra = '已达成：看中文默写整词，标记为「已掌握」';
-    else if(r.levelUp) extra = '难度提升到 L' + r.newLevel + '，下次会多挖 1～2 个字母';
+    else if(r.levelUp) extra = '难度提升到 L' + r.newLevel + '，下次每个词会多挖 2 个字母';
     else if(r.levelDown) extra = '难度回退到 L' + r.newLevel + '，先巩固一下';
     var fb = $('feedback');
     fb.className = 'feedback ' + (r.ok ? 'ok' : 'bad');
