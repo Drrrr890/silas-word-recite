@@ -31,6 +31,7 @@
 <title>Silas单词背诵</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%233568e8'/%3E%3Ctext x='32' y='46' font-size='42' font-family='Arial' font-weight='bold' text-anchor='middle' fill='white'%3ES%3C/text%3E%3C/svg%3E">
 <meta name="application-name" content="Silas单词背诵">
+<!-- BUILD 1.2.0 -->
 <style>
   :root{
     --bg:#f4f6fb; --card:#ffffff; --line:#e3e8f2; --text:#1b2434; --muted:#6b7688;
@@ -198,6 +199,40 @@
   .focus-bar button:disabled{opacity:.5;cursor:not-allowed}
   .focus-note{background:#fff7ed;color:#b45309;border:1px solid #fed7aa;border-radius:10px;padding:9px 12px;font-size:13px;margin-bottom:14px;display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap;text-align:center}
   .focus-note button{padding:4px 10px;font-size:12px}
+  /* ===== 1.2.0 练习次数 / 未练习统计 ===== */
+  .practice-info{display:flex;align-items:center;justify-content:center;gap:6px;flex-wrap:wrap;
+    margin:-8px 0 16px;padding:8px 12px;border:1px solid var(--line);border-radius:10px;
+    background:#f7f9ff;font-size:13px;color:var(--muted);text-align:center;line-height:1.8}
+  .practice-info b{color:var(--primary);font-weight:700}
+  .practice-info .sep{color:#c7d2e8}
+  .practice-info .fresh-tag{color:#b45309;background:#fff7ed;border:1px solid #fed7aa;border-radius:8px;padding:1px 9px}
+  .practice-info .fresh-tag b{color:#b45309}
+  .practice-info .all-done{color:var(--ok);font-weight:600}
+  .chip .cnt .fresh{color:#b45309;font-weight:700}
+  /* ===== 1.2.0 手写输入面板 ===== */
+  .hand-panel{margin:0 0 14px;padding:12px 14px 14px;border:1.5px solid var(--primary);border-radius:14px;background:#fbfdff}
+  .hand-head{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:9px}
+  .hand-head b{font-size:14px;color:var(--primary)}
+  .hand-head .note{margin:0;flex:1 1 200px;font-size:12px;line-height:1.5}
+  .hand-head button{padding:4px 10px;font-size:12px;min-height:32px}
+  .hand-paper{position:relative;height:150px;border:1px solid var(--line);border-radius:10px;overflow:hidden;
+    background:
+      linear-gradient(#dbe4f5,#dbe4f5) 0 24px/100% 1px no-repeat,
+      linear-gradient(#dbe4f5,#dbe4f5) 0 62px/100% 1px no-repeat,
+      linear-gradient(#efb9b9,#efb9b9) 0 100px/100% 1px no-repeat,
+      linear-gradient(#dbe4f5,#dbe4f5) 0 138px/100% 1px no-repeat,
+      #fffef9}
+  #handInput{position:absolute;inset:0;width:100%;height:100%;margin:0;border:0;background:transparent;
+    box-shadow:none;outline:none;text-align:center;font-family:Consolas,"Courier New",monospace;
+    font-size:40px;line-height:148px;font-weight:600;letter-spacing:2px;color:var(--text);padding:0 10px;border-radius:10px}
+  #handInput:focus{border:0;box-shadow:none}
+  #handInput[readonly]{opacity:.75}
+  .hand-tip{font-size:11.5px;color:var(--muted);margin:7px 0 0;line-height:1.6}
+  .hand-draft-wrap{margin-top:10px}
+  .hand-draft-head{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:6px;font-size:12px;color:var(--muted)}
+  .hand-draft-head button{padding:3px 9px;font-size:12px;min-height:30px}
+  .hand-draft{height:110px;border:1px dashed var(--line);border-radius:10px;background:#fff;overflow:hidden;touch-action:none}
+  #handCanvas{display:block;width:100%;height:100%;touch-action:none;cursor:crosshair}
   @media(max-width:560px){
     .wrap{padding:16px 12px 40px}
     .card{padding:18px 14px}
@@ -241,9 +276,11 @@
   #quizCard .cloze { order: 3; font-size: 52px; margin: 14px 0 16px; }
   #quizCard .word-card { order: 4; }
   #quizCard .quiz-actions { order: 5; }
-  #quizCard .answer-row { order: 6; }
-  #quizCard .hint { order: 7; }
-  #quizCard .level-note { order: 8; }
+  #quizCard .practice-info { order: 2; }
+  #quizCard .hand-panel { order: 6; }
+  #quizCard .answer-row { order: 7; }
+  #quizCard .hint { order: 8; }
+  #quizCard .level-note { order: 9; }
 
   /* 学习卡内容放大，便于阅读 */
   .meaning { font-size: 32px; line-height: 1.35; }
@@ -285,6 +322,20 @@
     button.primary:hover { background: var(--primary); color: #fff; }
     button.danger:hover { border-color: var(--line); color: var(--bad); }
   }
+
+  /* iPad：给手写留出更大的落笔区域 */
+  #quizCard .practice-info { order: 2; font-size: 14px; padding: 10px 12px; }
+  #quizCard .hand-panel { order: 6; padding: 14px; }
+  #quizCard .answer-row { order: 7; }
+  #quizCard .hint { order: 8; }
+  #quizCard .level-note { order: 9; }
+  .hand-paper { height: 200px; }
+  #handInput { font-size: 48px; line-height: 198px; }
+  .hand-draft { height: 160px; }
+  .hand-head button, .hand-draft-head button { min-height: 40px; font-size: 14px; padding: 6px 12px; }
+  .hand-tip { font-size: 13px; }
+  /* 触屏设备上不用键盘也能点，避免软键盘遮挡手写区 */
+  #handInput { ime-mode: inactive; }
 }
 </style>
 </head>
@@ -319,10 +370,33 @@
       <div class="card" id="quizCard">
         <div class="quiz-top"><span id="roundInfo">第 1 题</span><span id="sessionInfo">本次 0 对 / 0 错</span></div>
         <div class="resume-note hidden" id="resumeNote"></div>
+        <div class="practice-info hidden" id="practiceInfo"></div>
         <!-- 题目区：挖空、整词输入、检查/下一个与操作按钮放在上方 -->
         <div class="cloze" id="cloze"></div>
+        <!-- iPad 手写输入：大号原生输入框支持 Apple Pencil「随手写」，下方另附笔迹草稿板 -->
+        <div class="hand-panel hidden" id="handPanel">
+          <div class="hand-head">
+            <b>手写输入</b>
+            <span class="note">用 Apple Pencil 或手指在下面四线格内直接写单词，写出的内容会自动填进答案框。</span>
+            <button class="sm" id="handClear">清空</button>
+            <button class="sm" id="handClose">收起</button>
+          </div>
+          <div class="hand-paper">
+            <input id="handInput" type="text" autocomplete="off" autocorrect="off" autocapitalize="off"
+              spellcheck="false" inputmode="text" enterkeyhint="done" placeholder="在这里手写单词" aria-label="手写输入单词">
+          </div>
+          <p class="hand-tip">iPad：请先开启「设置 → Apple Pencil → 随手写（Scribble）」，再用 Pencil 在上方格里书写即自动转成文字；也可以直接在这里用键盘输入。手写内容与上方答案框实时同步，写完点「检查」即可。</p>
+          <div class="hand-draft-wrap">
+            <div class="hand-draft-head">
+              <span>手写草稿板（可先用笔练习书写，不参与判分）</span>
+              <button class="sm" id="draftUndo">撤销一笔</button>
+              <button class="sm" id="draftClear">擦干净</button>
+            </div>
+            <div class="hand-draft"><canvas id="handCanvas"></canvas></div>
+          </div>
+        </div>
         <div class="answer-row">
-          <input id="answer" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="写出完整的英文单词">
+          <input id="answer" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" inputmode="text" enterkeyhint="done" placeholder="写出完整的英文单词">
           <button class="primary" id="submitBtn">检查</button>
           <button class="primary hidden" id="nextBtn">下一个 →</button>
         </div>
@@ -331,7 +405,9 @@
           <button class="ghost" id="reshuffleBtn">换一组挖空</button>
           <button class="ghost" id="revealBtn">不会，看答案</button>
           <button class="ghost" id="restartBtn">重开本轮</button>
+          <button class="ghost" id="handBtn">手写输入</button>
           <label class="switch"><input type="checkbox" id="onlyWrong"> 只练错词</label>
+          <label class="switch"><input type="checkbox" id="onlyFresh"> <span id="onlyFreshLabel">只练没练过的</span></label>
           <label class="switch"><input type="checkbox" id="showExample"> 例句提示</label>
           <label class="switch"><input type="checkbox" id="showPos"> 词性注释</label>
         </div>
@@ -392,7 +468,7 @@
         <p class="note">勾选想重点练的单词，再点「练习选中单词」，出题就只从这些词里随机抽；针对练习时来源筛选暂不生效，「只练错词」仍生效，退出后恢复原样。勾选会随进度一起自动保存。中文释义下方的小字是这个词的例句翻译，鼠标停在上面可以看完整英文例句。</p>
         <div class="table-scroll">
           <table>
-            <thead><tr><th>勾选 / 英文</th><th>中文</th><th>发音</th><th>来源</th><th>答对</th><th>错误</th><th>正确率</th><th>难度</th><th class="ops">操作</th></tr></thead>
+            <thead><tr><th>勾选 / 英文</th><th>中文</th><th>发音</th><th>来源</th><th>已练</th><th>答对</th><th>错误</th><th>正确率</th><th>难度</th><th class="ops">操作</th></tr></thead>
             <tbody id="wordBody"></tbody>
           </table>
         </div>
@@ -484,10 +560,10 @@
       <button class="sm" id="srcAll">全部来源</button>
     </div>
     <div class="src-chips" id="sourceChips"></div>
-    <p class="note">勾选一个或多个来源后，背诵、词库和统计都只看这些来源；同一个单词出现在多个来源时，勾中任意一个都会练到它。「未标注」是自己添加时没填来源的单词。</p>
+    <p class="note">勾选一个或多个来源后，背诵、词库和统计都只看这些来源；同一个单词出现在多个来源时，勾中任意一个都会练到它。「未标注」是自己添加时没填来源的单词。每个来源后面的数字依次是「单词总数 · 还没练过的个数」；背诵页上方也会显示当前这个词已经练过几次、本组还有几个词一次都没练过。想先把新词过一遍，可勾选背诵页的「只练没练过的」。</p>
   </div>
 
-  <p class="foot">操作提示：每题都要写出完整的英文单词（上方挖空只是提示，不能只补缺少的字母），输入后按回车或点「检查」；答完会停在本题、不会自动跳题，看清正确单词、例句和注释后，点「下一个」按钮（或按回车）才开始下一个单词的练习；关闭页面后会自动接着上一次那一题继续。<br>难度自动进阶：初始挖 1～2 个字母，正确率高于 50% 且答对次数足够时升一级、每级多挖 1～2 个，最后变成只看中文默写整词；答错会降一级。答错和「看答案」都会累计错误次数。<br>每题都可以点「听发音」听英语读音（发音已内置在程序里，离线可播），答完题会自动朗读一遍；中文词义、来源、双语例句和答后答案（正确单词、音标、词性与词典注释）都集中在下方同一张「学习卡」里（例句答题时挖空、答完在同一张卡里补全，可用「例句提示」开关切换；「词性注释」开关只控制音标和注释，正确单词始终显示）；学习统计受管理窗口保护，清空、覆盖、删除等操作需要管理密码；页面下方可以按来源勾选背诵范围，一个单词属于多个来源时，任选一个来源都会练到它。<br>还可以到「单词库」勾选若干单词，点「练习选中单词」只练这些词；背诵页顶部提示条可随时退出针对练习。</p>
+  <p class="foot"><b>版本 1.2.0</b>：新增练习次数与「还有几个单词没练过」的显示、iPad 手写输入（Apple Pencil 随手写 + 手写草稿板），以及「只练没练过的」范围开关。<br>操作提示：每题都要写出完整的英文单词（上方挖空只是提示，不能只补缺少的字母），输入后按回车或点「检查」；答完会停在本题、不会自动跳题，看清正确单词、例句和注释后，点「下一个」按钮（或按回车）才开始下一个单词的练习；关闭页面后会自动接着上一次那一题继续。<br>难度自动进阶：初始挖 1～2 个字母，正确率高于 50% 且答对次数足够时升一级、每级多挖 1～2 个，最后变成只看中文默写整词；答错会降一级。答错和「看答案」都会累计错误次数。<br>每题都可以点「听发音」听英语读音（发音已内置在程序里，离线可播），答完题会自动朗读一遍；中文词义、来源、双语例句和答后答案（正确单词、音标、词性与词典注释）都集中在下方同一张「学习卡」里（例句答题时挖空、答完在同一张卡里补全，可用「例句提示」开关切换；「词性注释」开关只控制音标和注释，正确单词始终显示）；学习统计受管理窗口保护，清空、覆盖、删除等操作需要管理密码；页面下方可以按来源勾选背诵范围，一个单词属于多个来源时，任选一个来源都会练到它。<br>还可以到「单词库」勾选若干单词，点「练习选中单词」只练这些词；背诵页顶部提示条可随时退出针对练习。</p>
 </div>
 
 <div id="toast"></div>
@@ -701,8 +777,10 @@ go fishing	去钓鱼
   function normalize(s){
     s = s || {};
     s.words = cleanWords(s.words);
-    s.settings = Object.assign({onlyWrong:false, autoSpeak:true, speakOnQuestion:false, showExample:true, showPos:true, rate:0.9, voiceMode:'builtin', sources:[]}, s.settings || {});
+    s.settings = Object.assign({onlyWrong:false, onlyFresh:false, autoSpeak:true, speakOnQuestion:false, showExample:true, showPos:true, rate:0.9, voiceMode:'builtin', sources:[]}, s.settings || {});
     s.settings.sources = cleanSources(s.settings.sources);
+    s.settings.onlyFresh = !!s.settings.onlyFresh;
+    s.settings.onlyWrong = !!s.settings.onlyWrong;
     s.settings.autoSpeak = s.settings.autoSpeak !== false;
     s.settings.showExample = s.settings.showExample !== false;
     s.settings.showPos = s.settings.showPos !== false;
@@ -812,6 +890,14 @@ go fishing	去钓鱼
     return state.words.filter(function(w){
       var s = w.sources || [];
       return src === NO_SOURCE ? !s.length : s.indexOf(src) >= 0;
+    }).length;
+  }
+  // 某个来源里「一次都没练过」的单词数（一个词可属于多个来源，各自分别统计）
+  function sourceFreshCount(src){
+    return state.words.filter(function(w){
+      var s = w.sources || [];
+      if(src === NO_SOURCE ? s.length : s.indexOf(src) < 0) return false;
+      return !(Number(w.seen) > 0);
     }).length;
   }
   function sourceBadges(w){
@@ -1390,9 +1476,19 @@ go fishing	去钓鱼
   }
   function focusMode(){ return !!(pickState().active && pickedWords().length); }
 
+  // 当前练习范围：针对练习优先，否则按来源筛选（不受「只练错词 / 只练没练过的」影响）
+  function scopeWords(){ return focusMode() ? pickedWords() : inScopeWords(); }
+  function freshCount(list){
+    var n = 0;
+    list.forEach(function(w){ if(!(Number(w.seen) > 0)) n++; });
+    return n;
+  }
   function pool(){
-    var base = focusMode() ? pickedWords() : inScopeWords();
-    return base.filter(function(w){ return !state.settings.onlyWrong || w.wrong > 0; });
+    return scopeWords().filter(function(w){
+      if(state.settings.onlyWrong && !(w.wrong > 0)) return false;
+      if(state.settings.onlyFresh && Number(w.seen) > 0) return false;
+      return true;
+    });
   }
 
   function pickNext(){
@@ -1426,6 +1522,27 @@ go fishing	去钓鱼
         ' · 正确率 >50% 且累计答对 ' + need + ' 次后升级（当前 ' + current.right + ' 次，每升一级多挖 1～2 个字母）';
     }
   }
+  // 背诵页信息条：显示当前范围、这个词的练习次数、本组还有几个词没练过
+  function renderPracticeInfo(){
+    var box = $('practiceInfo'); if(!box) return;
+    var list = scopeWords(), f = focusMode(), sel = selectedSources();
+    var fresh = freshCount(list);
+    var scopeLabel = f ? '针对练习 · 已勾选'
+      : (sel.length ? '来源筛选 · ' + sel.length + ' 个来源' : '全部来源');
+    var parts = ['<span>' + esc(scopeLabel) + '，共 <b>' + list.length + '</b> 个单词</span>'];
+    if(current){
+      parts.push('<span>这个词已练 <b>' + (Number(current.seen) || 0) + '</b> 次（对 ' +
+        (Number(current.right) || 0) + ' / 错 ' + (Number(current.wrong) || 0) + '）</span>');
+    } else {
+      parts.push('<span>本词练习次数将在出题后显示</span>');
+    }
+    if(fresh > 0) parts.push('<span class="fresh-tag">还有 <b>' + fresh + '</b> 个单词没练过</span>');
+    else if(list.length) parts.push('<span class="all-done">本组单词都练过了</span>');
+    box.innerHTML = parts.join('<span class="sep">｜</span>');
+    box.classList.remove('hidden');
+    var lab = $('onlyFreshLabel');
+    if(lab) lab.textContent = '只练没练过的（' + fresh + '）';
+  }
   function updateTop(){
     $('roundInfo').textContent = '第 ' + (state.session.total + (phase === 'feedback' ? 0 : 1)) + ' 题';
     $('sessionInfo').textContent = '本次 ' + state.session.right + ' 对 / ' + state.session.wrong + ' 错';
@@ -1446,6 +1563,8 @@ go fishing	去钓鱼
     var fb = $('feedback'); fb.className = 'feedback'; fb.innerHTML = '';
     renderAnswerCard();
     var input = $('answer'); input.value = ''; input.readOnly = false;
+    if($('handInput')){ $('handInput').value = ''; $('handInput').readOnly = false; }
+    clearDraft();
     setNextButton(false);
     if(!state.words.length || !(focusMode() ? pickedWords() : inScopeWords()).length){
       clearProgress(); save();
@@ -1456,9 +1575,13 @@ go fishing	去钓鱼
       return;
     }
     $('quizCard').classList.remove('hidden'); $('emptyCard').classList.add('hidden');
-    if(state.settings.onlyWrong && !pool().length){
+    if(state.settings.onlyWrong && !scopeWords().some(function(w){ return w.wrong > 0; })){
       state.settings.onlyWrong = false; $('onlyWrong').checked = false;
       toast(focusMode() ? '选中的单词里还没有错词，先全部练一遍' : '还没有错词，先练全部单词');
+    }
+    if(state.settings.onlyFresh && freshCount(scopeWords()) === 0){
+      state.settings.onlyFresh = false; $('onlyFresh').checked = false;
+      toast('这一组单词都练过了，已恢复全部随机出题');
     }
     current = pickNext();
     if(!current){
@@ -1476,7 +1599,7 @@ go fishing	去钓鱼
     rememberMask(current.id, cloze.masked);
     $('meaning').textContent = current.zh || '（未填写释义）';
     $('sourceNote').textContent = sourceText(current);
-    renderCloze(); renderHint(); updateTop(); renderExample();
+    renderCloze(); renderHint(); updateTop(); renderExample(); renderPracticeInfo();
     save();
     input.focus();
     if(state.settings.speakOnQuestion){
@@ -1534,7 +1657,7 @@ go fishing	去钓鱼
     $('answer').readOnly = true;
     setNextButton(true);
     updateTop();
-    renderWords();
+    renderWords(); renderPracticeInfo(); syncHandReadOnly();
     if(state.settings.autoSpeak) speakWord(current);
     // 不论答对答错都不自动跳题，停在本题等使用者点「下一个」按钮（或按回车）确认后再继续
   }
@@ -1581,7 +1704,7 @@ go fishing	去钓鱼
     lastId = p.lastId || null;
     $('meaning').textContent = w.zh || '（未填写释义）';
     $('sourceNote').textContent = sourceText(w);
-    renderCloze(); renderHint(); updateTop(); renderExample();
+    renderCloze(); renderHint(); updateTop(); renderExample(); renderPracticeInfo();
     var input = $('answer');
     input.value = typeof p.answerText === 'string' ? p.answerText : '';
     // 还没作答的题：重新随机一组挖空，避免每次打开程序看到的都是同一组空格。
@@ -1597,6 +1720,11 @@ go fishing	去钓鱼
       }
     }
     input.readOnly = phase === 'feedback';
+    if($('handInput')){
+      $('handInput').value = input.value;
+      $('handInput').readOnly = input.readOnly;
+    }
+    clearDraft();
     if(phase === 'feedback'){
       showFeedback(true);
       setNextButton(true);
@@ -1657,6 +1785,17 @@ go fishing	去钓鱼
     toast(e.target.checked ? '已切换为只练错词' : '已切换为全部单词随机');
     nextQuestion();
   });
+  $('onlyFresh').addEventListener('change', function(e){
+    state.settings.onlyFresh = e.target.checked;
+    remaining = []; save();
+    if(e.target.checked && freshCount(scopeWords()) === 0){
+      state.settings.onlyFresh = false; e.target.checked = false;
+      toast('这一组单词都练过了，没有需要新练的词');
+    } else {
+      toast(e.target.checked ? '已切换为只练没练过的单词' : '已恢复本组全部单词随机出题');
+    }
+    nextQuestion();
+  });
   $('goWords').addEventListener('click', function(){ goView('words'); });
   document.addEventListener('keydown', function(e){
     if(e.key === 'Enter' && phase === 'feedback' && document.activeElement !== $('answer') &&
@@ -1666,6 +1805,104 @@ go fishing	去钓鱼
       e.preventDefault(); $('nextBtn').click();
     }
   });
+
+  // ===== 1.2.0 iPad 手写输入 =====
+  // 说明：iPadOS 的「随手写 / Scribble」会直接作用于网页里的原生 input，
+  // 因此这里提供一个足够大的、铺满四线格的原生输入框作为落笔区（离线可用、无需第三方识别库）。
+  // 另外提供一个 canvas 草稿板，支持 Apple Pencil / 手指 / 鼠标书写与逐笔撤销。
+  var handOpen = false;
+  var draftCanvas = $('handCanvas');
+  var dctx = draftCanvas ? draftCanvas.getContext('2d') : null;
+  var strokes = [], drawing = false;
+
+  function syncHandReadOnly(){
+    if(!$('handInput')) return;
+    $('handInput').readOnly = (phase === 'feedback');
+  }
+  function sizeDraftCanvas(){
+    if(!draftCanvas || !dctx || !handOpen) return;
+    var r = draftCanvas.getBoundingClientRect();
+    if(r.width < 2 || r.height < 2) return;
+    var dpr = window.devicePixelRatio || 1;
+    var w = Math.round(r.width * dpr), h = Math.round(r.height * dpr);
+    if(draftCanvas.width !== w || draftCanvas.height !== h){
+      draftCanvas.width = w; draftCanvas.height = h;
+      dctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    }
+    drawDraft();
+  }
+  function drawDraft(){
+    if(!dctx || !draftCanvas) return;
+    var r = draftCanvas.getBoundingClientRect();
+    if(r.width < 2) return;
+    dctx.clearRect(0, 0, r.width, r.height);
+    [0.18, 0.42, 0.66, 0.9].forEach(function(p, i){
+      dctx.strokeStyle = i === 2 ? '#efc2c2' : '#e2e9f7';
+      dctx.lineWidth = 1;
+      dctx.beginPath(); dctx.moveTo(0, r.height * p); dctx.lineTo(r.width, r.height * p); dctx.stroke();
+    });
+    dctx.lineWidth = 3; dctx.lineCap = 'round'; dctx.lineJoin = 'round'; dctx.strokeStyle = '#3568e8';
+    strokes.forEach(function(st){
+      if(!st.length) return;
+      dctx.beginPath(); dctx.moveTo(st[0].x, st[0].y);
+      for(var i = 1; i < st.length; i++) dctx.lineTo(st[i].x, st[i].y);
+      if(st.length === 1) dctx.lineTo(st[0].x + 0.1, st[0].y + 0.1);
+      dctx.stroke();
+    });
+  }
+  function clearDraft(){ strokes = []; drawDraft(); }
+  function draftPos(e){
+    var r = draftCanvas.getBoundingClientRect();
+    return {x:e.clientX - r.left, y:e.clientY - r.top};
+  }
+  function setHandOpen(on){
+    handOpen = !!on;
+    $('handPanel').classList.toggle('hidden', !handOpen);
+    $('handBtn').textContent = handOpen ? '收起手写板' : '手写输入';
+    $('handBtn').classList.toggle('primary', handOpen);
+    if(handOpen){
+      $('handInput').value = $('answer').value;
+      syncHandReadOnly();
+      sizeDraftCanvas();
+      setTimeout(function(){ try{ $('handInput').focus(); }catch(e){} }, 40);
+    } else {
+      try{ $('answer').focus(); }catch(e){}
+    }
+  }
+  $('handBtn').addEventListener('click', function(){ setHandOpen(!handOpen); });
+  $('handClose').addEventListener('click', function(){ setHandOpen(false); });
+  $('handClear').addEventListener('click', function(){
+    $('handInput').value = ''; $('answer').value = ''; clearDraft(); save();
+    try{ $('handInput').focus(); }catch(e){}
+  });
+  $('handInput').addEventListener('input', function(){
+    if($('answer').value !== this.value) $('answer').value = this.value;
+    if(phase === 'answer') save();
+  });
+  $('handInput').addEventListener('keydown', function(e){
+    if(e.key === 'Enter'){ e.preventDefault(); if(phase === 'answer') check(); else $('nextBtn').click(); }
+  });
+  $('answer').addEventListener('input', function(){
+    if(handOpen && $('handInput').value !== $('answer').value) $('handInput').value = $('answer').value;
+  });
+  if(draftCanvas){
+    draftCanvas.addEventListener('pointerdown', function(e){
+      e.preventDefault();
+      try{ draftCanvas.setPointerCapture(e.pointerId); }catch(err){}
+      drawing = true; strokes.push([draftPos(e)]); drawDraft();
+    });
+    draftCanvas.addEventListener('pointermove', function(e){
+      if(!drawing) return;
+      e.preventDefault();
+      strokes[strokes.length - 1].push(draftPos(e)); drawDraft();
+    });
+    ['pointerup', 'pointercancel', 'pointerleave'].forEach(function(ev){
+      draftCanvas.addEventListener(ev, function(){ drawing = false; });
+    });
+    window.addEventListener('resize', function(){ if(handOpen) sizeDraftCanvas(); });
+  }
+  $('draftUndo').addEventListener('click', function(){ strokes.pop(); drawDraft(); });
+  $('draftClear').addEventListener('click', clearDraft);
 
   // ===== 来源筛选条 =====
   function renderSourceChips(){
@@ -1680,14 +1917,18 @@ go fishing	去钓鱼
     $('sourceChips').innerHTML = srcs.map(function(s){
       var on = sel.indexOf(s) >= 0;
       var label = s === NO_SOURCE ? '未标注' : s;
+      var fr = sourceFreshCount(s);
       return '<label class="chip' + (on ? ' on' : '') + '"><input type="checkbox" data-src="' +
         esc(s) + '"' + (on ? ' checked' : '') + '><span>' + esc(label) +
-        '</span><span class="cnt">' + sourceCount(s) + '</span></label>';
+        '</span><span class="cnt">' + sourceCount(s) + (fr ? ' · 未练 <span class="fresh">' + fr + '</span>' : '') +
+        '</span></label>';
     }).join('');
     var scoped = inScopeWords().length;
+    var scopedFresh = freshCount(inScopeWords());
     var text = sel.length
-      ? '当前范围：' + sel.map(function(s){ return s === NO_SOURCE ? '未标注' : s; }).join(' + ') + '，共 ' + scoped + ' 词'
-      : '当前范围：全部来源，共 ' + state.words.length + ' 词';
+      ? '当前范围：' + sel.map(function(s){ return s === NO_SOURCE ? '未标注' : s; }).join(' + ') +
+        '，共 ' + scoped + ' 词，其中 ' + scopedFresh + ' 词还没练过'
+      : '当前范围：全部来源，共 ' + state.words.length + ' 词，其中 ' + scopedFresh + ' 词还没练过';
     if(focusMode()) text += '（针对练习中，出题暂不按来源筛选）';
     $('scopeNote').textContent = text;
     $('statScope').textContent = text + '（统计与错词榜同此范围）';
@@ -1715,16 +1956,20 @@ go fishing	去钓鱼
   var editingId = null, visibleIds = [];
   // 针对练习条：勾选数量、全选状态、按钮可用性与背诵页顶部提示
   function renderPickBar(){
-    var n = pickedWords().length, f = focusMode();
-    $('selCount').textContent = n ? '已选 ' + n + ' 个单词' + (f ? '（针对练习中）' : '') : '已选 0 个单词';
+    var pw = pickedWords(), n = pw.length, f = focusMode(), pf = freshCount(pw);
+    $('selCount').textContent = n
+      ? '已选 ' + n + ' 个单词，其中 ' + pf + ' 个还没练过' + (f ? '（针对练习中）' : '')
+      : '已选 0 个单词';
     $('drillSelected').disabled = !n;
     $('selClear').disabled = !n;
     $('selAll').disabled = !visibleIds.length;
     $('selAll').checked = visibleIds.length > 0 && visibleIds.every(isPicked);
     $('focusText').textContent = f
-      ? '针对练习中：只从已勾选的 ' + n + ' 个单词里出题（来源筛选暂不生效，只练错词仍生效）'
+      ? '针对练习中：只从已勾选的 ' + n + ' 个单词里出题，其中 ' + pf +
+        ' 个还没练过（来源筛选暂不生效，只练错词仍生效；背诵页上方显示每个词的练习次数）'
       : '';
     $('focusNote').classList.toggle('hidden', !f);
+    renderPracticeInfo();
   }
   function levelLabel(w){
     if(w.mastered) return '<span class="lv mastered">已掌握</span>';
@@ -1746,7 +1991,7 @@ go fishing	去钓鱼
         ? '当前范围 ' + scope.length + ' 词（全库 ' + state.words.length + ' 个）' + (q ? '，找到 ' + list.length + ' 个' : '')
         : '共 ' + state.words.length + ' 个单词' + (q ? '，找到 ' + list.length + ' 个' : ''));
     if(!list.length){
-      $('wordBody').innerHTML = '<tr><td colspan="9"><div class="empty">' +
+      $('wordBody').innerHTML = '<tr><td colspan="10"><div class="empty">' +
         (state.words.length ? '当前范围内没有匹配的单词' : '词库为空，请在上方添加单词，或到管理窗口载入单词表') +
         '</div></td></tr>';
       refreshVoiceOptions(); renderPickBar();
@@ -1759,7 +2004,7 @@ go fishing	去钓鱼
           '<td><input class="cell-input" data-f="zh" value="' + esc(w.zh) + '"></td>' +
           '<td><input class="cell-input" data-f="say" value="' + esc(w.say) + '" placeholder="留空自动"></td>' +
           '<td><input class="cell-input" data-f="src" value="' + esc((w.sources || []).join(', ')) + '" placeholder="来源"></td>' +
-          '<td colspan="2" class="zero">编辑中</td><td>—</td><td>—</td>' +
+          '<td colspan="3" class="zero">编辑中</td><td>—</td><td>—</td>' +
           '<td class="ops"><button class="sm primary" data-act="save">保存</button> <button class="sm" data-act="cancel">取消</button></td></tr>';
       }
       var r = rate(w);
@@ -1771,6 +2016,7 @@ go fishing	去钓鱼
           esc(sayText(w)) + '</span>' +
           '<button class="sm" data-act="say" title="试听这个单词">听</button></td>' +
         '<td>' + sourceBadges(w) + '</td>' +
+        '<td>' + (Number(w.seen) || 0) + '</td>' +
         '<td>' + w.right + '</td>' +
         '<td class="' + (w.wrong ? 'wrong-num' : 'zero') + '">' + w.wrong + '</td>' +
         '<td class="' + (r === null ? 'zero' : '') + '">' + (r === null ? '—' : r + '%') + '</td>' +
@@ -1964,6 +2210,7 @@ go fishing	去钓鱼
     $('speakOnQuestion').checked = state.settings.speakOnQuestion;
     $('voiceModeSel').value = state.settings.voiceMode;
     $('onlyWrong').checked = state.settings.onlyWrong;
+    $('onlyFresh').checked = state.settings.onlyFresh;
     $('showExample').checked = state.settings.showExample;
     $('showPos').checked = state.settings.showPos;
     $('autoEnrich').checked = state.settings.autoEnrich;
@@ -2364,7 +2611,7 @@ go fishing	去钓鱼
   }
   syncSettingsUI();
   updateLockTag();
-  renderSourceChips(); renderWords(); renderStats();
+  renderSourceChips(); renderWords(); renderStats(); renderPracticeInfo(); syncHandReadOnly();
   if(!restoreProgress()) nextQuestion();
   else $('answer').focus();
   syncSeedWords();   // 内置词库不再自动补齐，只在管理窗口里手动载入

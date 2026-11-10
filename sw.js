@@ -2,7 +2,7 @@
 // 缓存整个应用（单文件 HTML + 图标 + 清单），实现离线可用。
 // 注意：index.html 走「网络优先」，保证部署新版本后刷新即可见到更新；
 // 其余静态资源（图标/清单）走「缓存优先」，离线时仍可用。
-const CACHE = 'word-recite-v2';
+const CACHE = 'word-recite-v3';
 const ASSETS = [
   './',
   './index.html',
