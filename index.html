@@ -13,7 +13,18 @@
 <script>
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', function () {
-      navigator.serviceWorker.register('./sw.js').catch(function (e) { console.log('SW register failed', e); });
+      navigator.serviceWorker.register('./sw.js', { updateViaCache: 'none' })
+        .then(function (reg) { if (reg.update) reg.update(); })
+        .catch(function (e) { console.log('SW register failed', e); });
+    });
+    // 新版 SW 接管后自动刷新一次，确保立即用到最新单词表（避免要手动刷新两次）
+    var hadController = !!navigator.serviceWorker.controller;
+    var swReloaded = false;
+    navigator.serviceWorker.addEventListener('controllerchange', function () {
+      if (!hadController) { hadController = true; return; }
+      if (swReloaded) return;
+      swReloaded = true;
+      location.reload();
     });
   }
 </script>
@@ -515,7 +526,7 @@
         <div class="admin-item"><div><b>清空错误统计</b><span>清除所有单词的答对/错误次数、难度与已掌握标记，单词本身保留</span></div><button class="sm danger" id="admReset">清空</button></div>
         <div class="admin-item"><div><b>清空全部单词</b><span>清空词库、统计与进度；管理密码、发音设置保留，清空前自动留快照</span></div><button class="sm danger" id="admWipe">清空全部</button></div>
         <div class="admin-item"><div><b>撤销上一次词库变更</b><span>找回清空 / 载入 / 导入之前的词库与统计</span></div><button class="sm" id="admUndo">撤销</button></div>
-        <div class="admin-item"><div><b>重新载入单词表</b><span>按 2026-11-09 单词表补齐词条与来源，已有学习统计保留</span></div><button class="sm" id="admReloadList">载入</button></div>
+        <div class="admin-item"><div><b>重新载入单词表</b><span>按内置单词表补齐词条与来源（含 Unit Six / Unit Seven），已有学习统计保留</span></div><button class="sm" id="admReloadList">载入</button></div>
         <div class="admin-item"><div><b>载入内置词库</b><span>载入内置 91 个单词，当前词库、统计与进度都会清除</span></div><button class="sm" id="admRestore">载入</button></div>
         <div class="admin-item"><div><b>修改管理密码</b><span>设置一个新密码</span></div><button class="sm" id="admChangePwd">修改</button></div>
       </div>
@@ -666,7 +677,7 @@ go fishing	去钓鱼
 
   var SEED_VERSION = 2;  // 内置词库版本（仅用于手动载入时的标记）
   var WIPE_VERSION = 2;  // 清空版本：老存档第一次打开时一次性清空，并留下可撤销快照
-  var LIST_VERSION = 3;  // 单词表版本：按 2026-11-09 新单词表（单元级来源）重建词库
+  var LIST_VERSION = 4;  // 单词表版本：新增 Unit Six / Unit Seven 后重建词库（单元级来源）
 
   // 默认不再自动补齐内置词，避免清空后的词库又被填回去
   function syncSeedWords(){ return 0; }
@@ -2212,7 +2223,7 @@ go fishing	去钓鱼
     toast('统计与难度已清空');
   }
   function doReloadList(){
-    if(!confirm('重新载入「单词表-20261109.xls」的词条与来源？已学统计、难度和进度都会保留，只补齐缺失的词与来源。')) return;
+    if(!confirm('重新载入内置单词表的词条与来源？已学统计、难度和进度都会保留，只补齐缺失的词与来源。')) return;
     var r = importWordList();
     state.listVersion = LIST_VERSION;
     remaining = []; save();
@@ -2314,15 +2325,18 @@ go fishing	去钓鱼
     save();
     if(oldCount) wipeNotice = '已清空原词库 ' + oldCount + ' 个单词；可在「管理窗口 → 撤销上一次词库变更」找回';
   }
-  // 第一次打开时按单词表导入词条与来源：重复词合并成一个对象，来源取并集
+  // 每次单词表升级时补齐词条与来源：重复词合并成一个对象，来源取并集
   var listNotice = '';
   if((state.listVersion || 0) < LIST_VERSION){
     var lr = importWordList();
+    var scopeReset = selectedSources().length > 0;
+    if(scopeReset) state.settings.sources = [];  // 升级后回到「全部来源」，保证新单元的词可见
     state.listVersion = LIST_VERSION;
     remaining = [];
     clearProgress();
     save();
-    if(lr.added) listNotice = '已按新单词表导入 ' + lr.added + ' 个单词，并标注 Jenny-KB 与各单元（三年级上册-Unit One…Five）来源';
+    if(lr.added) listNotice = '已按新单词表导入 ' + lr.added + ' 个单词（含 Unit Six / Unit Seven）' +
+      (scopeReset ? '，来源筛选已重置为「全部来源」以便查看新词' : '，并标注各单元来源');
   }
   syncSettingsUI();
   updateLockTag();
