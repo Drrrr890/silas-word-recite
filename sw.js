@@ -1,7 +1,8 @@
 // Service Worker for 单词背诵 PWA
-// 缓存整个应用（单文件 HTML + 图标 + 清单），实现离线可用。
-// 注意：index.html 走「网络优先」，保证部署新版本后刷新即可见到更新；
-// 其余静态资源（图标/清单）走「缓存优先」，离线时仍可用。
+// 策略：缓存优先 + 后台静默更新。
+// 先秒回本地缓存，不再因 GitHub Pages 网络卡顿而让 iPad 打开图标长时间等待；
+// 联网时在后台静默拉取最新 index.html 更新缓存，下次打开即是最新。
+// 静态资源（图标/清单）一旦缓存几乎不变，不再回源，离线也能用。
 const CACHE = 'word-recite-v4';
 const ASSETS = [
   './',
@@ -12,23 +13,39 @@ const ASSETS = [
   './apple-touch-icon.png'
 ];
 
+// 每个 SW 生命周期内，HTML 后台刷新最多触发一次（避免反复拉取 5.2MB）
+const htmlChecked = new Set();
+
 self.addEventListener('install', (event) => {
-  event.waitUntil(
-    caches.open(CACHE)
-      .then((cache) => cache.addAll(ASSETS))
-      .then(() => self.skipWaiting())
-  );
+  event.waitUntil((async () => {
+    const cache = await caches.open(CACHE);
+    // 逐个缓存，单个失败（如离线）不影响整体安装
+    await Promise.all(ASSETS.map((a) =>
+      cache.add(a).catch((e) => console.log('[sw] cache add skip', a, e && e.message))
+    ));
+    await self.skipWaiting();
+  })());
 });
 
 self.addEventListener('activate', (event) => {
-  event.waitUntil(
-    caches.keys()
-      .then((keys) => Promise.all(
-        keys.filter((k) => k !== CACHE).map((k) => caches.delete(k))
-      ))
-      .then(() => self.clients.claim())
-  );
+  event.waitUntil((async () => {
+    const keys = await caches.keys();
+    await Promise.all(
+      keys.filter((k) => k !== CACHE).map((k) => caches.delete(k))
+    );
+    await self.clients.claim();
+  })());
 });
+
+// 后台静默刷新：成功则更新缓存，失败（离线/网络差）保留旧缓存
+async function backgroundRefresh(req, cache) {
+  try {
+    const resp = await fetch(req);
+    if (resp && resp.status === 200) {
+      await cache.put(req, resp.clone());
+    }
+  } catch (e) { /* 离线或网络差，保留旧缓存 */ }
+}
 
 self.addEventListener('fetch', (event) => {
   const req = event.request;
@@ -38,33 +55,32 @@ self.addEventListener('fetch', (event) => {
     url.pathname.endsWith('/index.html') ||
     (url.pathname.endsWith('/') && req.destination === 'document');
 
-  // HTML 页面：网络优先，离线时回退缓存（确保更新立即可见）
-  if (isHtml) {
-    event.respondWith(
-      fetch(req)
-        .then((resp) => {
-          if (resp && resp.status === 200) {
-            const copy = resp.clone();
-            caches.open(CACHE).then((c) => c.put(req, copy));
-          }
-          return resp;
-        })
-        .catch(() => caches.match(req))
-    );
-    return;
-  }
+  event.respondWith((async () => {
+    const cache = await caches.open(CACHE);
+    const cached = await cache.match(req);
+    if (cached) {
+      // 命中缓存：立即返回；HTML 在后台静默刷新一次
+      if (isHtml && !htmlChecked.has(req.url)) {
+        htmlChecked.add(req.url);
+        event.waitUntil(backgroundRefresh(req, cache));
+      }
+      return cached;
+    }
 
-  // 其余静态资源：缓存优先，未命中再网络并写入缓存
-  event.respondWith(
-    caches.match(req).then((cached) => {
-      if (cached) return cached;
-      return fetch(req).then((resp) => {
-        if (resp && resp.status === 200 && resp.type === 'basic') {
-          const copy = resp.clone();
-          caches.open(CACHE).then((c) => c.put(req, copy));
-        }
-        return resp;
-      }).catch(() => cached);
-    })
-  );
+    // 当前缓存未命中：先查任意旧缓存兜底（版本切换 / 离线安装时）
+    const any = await caches.match(req);
+    if (any) return any;
+
+    // 都没有：走网络并写入缓存
+    try {
+      const resp = await fetch(req);
+      if (resp && resp.status === 200) {
+        const copy = resp.clone();
+        event.waitUntil(cache.put(req, copy));
+      }
+      return resp;
+    } catch (e) {
+      return any || Response.error();
+    }
+  })());
 });
